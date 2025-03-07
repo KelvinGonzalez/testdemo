@@ -1,6 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+      options: const FirebaseOptions(
+          apiKey: String.fromEnvironment("API_KEY"),
+          projectId: String.fromEnvironment("PROJECT_ID"),
+          messagingSenderId: String.fromEnvironment("MESSAGING_SENDER_ID"),
+          appId: String.fromEnvironment("APP_ID")));
   runApp(const MyApp());
 }
 
@@ -47,6 +56,20 @@ class _HomeWidgetState extends State<HomeWidget> {
   int _count = 0;
 
   @override
+  void initState() {
+    super.initState();
+
+    final db = FirebaseFirestore.instance;
+    final collection = db.collection("Documents");
+    final reference = collection.doc("Count");
+    reference.snapshots().listen((data) {
+      setState(() {
+        _count = data.data()?["count"] ?? 0;
+      });
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -80,8 +103,8 @@ class _HomeWidgetState extends State<HomeWidget> {
   }
 
   void onClicked() {
-    setState(() {
-      _count++;
-    });
+    final reference =
+        FirebaseFirestore.instance.collection("Documents").doc("Count");
+    reference.update({"count": FieldValue.increment(1)});
   }
 }
