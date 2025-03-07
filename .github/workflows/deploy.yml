@@ -30,7 +30,7 @@ jobs:
 
       - name: Build
         run: |
-          flutter build web
+          flutter build web --dart-define="API_KEY=${{ secrets.API_KEY }}" --dart-define="PROJECT_ID=${{ secrets.PROJECT_ID }}" --dart-define="MESSAGING_SENDER_ID=${{ secrets.MESSAGING_SENDER_ID }}" --dart-define="APP_ID=${{ secrets.APP_ID }}"
           cp -avr ./build/web/* ./
 
       - name: Commit build
